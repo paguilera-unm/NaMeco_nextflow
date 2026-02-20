@@ -24,42 +24,6 @@ nameco_nextflow/
 
 ---
 
-## Gestión de salidas (nueva sintaxis)
-
-La publicación de archivos ya **no** se define en cada proceso con `publishDir`.
-Todo se gestiona en `main.nf` mediante dos bloques:
-
-### 1. Sección `publish:` dentro del workflow
-```nextflow
-workflow {
-    main:
-    // ... llamadas a procesos ...
-
-    publish:
-    CHOPPER.out.chopped              >> 'Quality_control/Chopper'
-    EXTRACT_READS.out.fasta          >> 'Quality_control/Fastas'
-    COLLECT_POLISHED.out.rep_seqs    >> 'Final_output'
-    // etc.
-}
-```
-
-### 2. Bloque `output {}` (fuera del workflow)
-Configura cada target de publicación:
-```nextflow
-output {
-    'Quality_control/Chopper' { mode 'copy' }
-    'Final_output'            { mode 'copy' }
-}
-```
-
-### 3. `outputDir` en nextflow.config
-Actúa como directorio base para todos los targets:
-```groovy
-outputDir = params.out_dir   // todos los paths de output {} se prefijan con esto
-```
-
----
-
 ## Uso básico
 
 ```bash
@@ -136,25 +100,6 @@ NaMeco_out/
     ├── report.html
     └── trace.txt
 ```
-
----
-
-## Qué cambió respecto a la versión anterior
-
-| Aspecto                          | v1 (deprecado)                      | v2 (actual ≥ 24.10)                   |
-|----------------------------------|-------------------------------------|---------------------------------------|
-| Dónde se define la publicación   | `publishDir` en cada proceso        | `publish:` + `output {}` en `main.nf`|
-| Config global de publicación     | Repetido en cada `publishDir`       | `workflow.output` en `nextflow.config`|
-| Directorio base                  | Interpolado en cada string          | `outputDir` global                    |
-| `nextflow.enable.dsl = 2`        | Requerido                           | Eliminado (DSL2 es el default)        |
-| `optional true` en outputs       | `optional true`                     | `optional: true`                      |
-
----
-
-## Dependencias
-
-Instalar QIIME2 + RESCRIPt siguiendo la [guía oficial](https://docs.qiime2.org/).
-El resto de dependencias están en `environment.yml`.
 
 ---
 
